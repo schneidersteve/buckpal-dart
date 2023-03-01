@@ -37,3 +37,17 @@ Feature: Send Money
 
     And accounts have been updated
 ```
+
+# Dart Examples
+
+> dart pub get
+
+> dart analyze
+
+> dart test
+
+> dart test -r expanded
+
+> dart run
+
+> find . -name "*.dart" | entr -cr dart test -r expanded
