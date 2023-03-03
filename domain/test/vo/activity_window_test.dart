@@ -27,18 +27,21 @@ void main() {
     var account1 = AccountId(1);
     var account2 = AccountId(2);
     var window = ActivityWindow([
-        defaultActivity()
-            .withSourceAccount(account1)
-            .withTargetAccount(account2)
-            .withMoney(Money.of(999)).build(),
-        defaultActivity()
-            .withSourceAccount(account1)
-            .withTargetAccount(account2)
-            .withMoney(Money.of(1)).build(),
-        defaultActivity()
-            .withSourceAccount(account2)
-            .withTargetAccount(account1)
-            .withMoney(Money.of(500)).build()
+      defaultActivity()
+          .withSourceAccount(account1)
+          .withTargetAccount(account2)
+          .withMoney(Money.of(999))
+          .build(),
+      defaultActivity()
+          .withSourceAccount(account1)
+          .withTargetAccount(account2)
+          .withMoney(Money.of(1))
+          .build(),
+      defaultActivity()
+          .withSourceAccount(account2)
+          .withTargetAccount(account1)
+          .withMoney(Money.of(500))
+          .build()
     ]);
     expect(window.calculateBalance(account1), Money.of(-500));
     expect(window.calculateBalance(account2), Money.of(500));

@@ -1,3 +1,4 @@
 library domain;
 
-// export 'src/domain_base.dart';
+export 'src/ar/account.dart';
+export 'src/vo/money.dart';

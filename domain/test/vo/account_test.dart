@@ -69,7 +69,7 @@ void main() {
     expect(account.calculateBalance(), Money.of(1555));
   });
 
-    test('depositSuccess', () {
+  test('depositSuccess', () {
     var accountId = AccountId(1);
     var account = defaultAccount()
         .withAccountId(accountId)

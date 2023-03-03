@@ -5,13 +5,10 @@ import 'vo/money.dart';
 
 AccountBuilder defaultAccount() {
   return AccountBuilder()
-    .withAccountId(AccountId(42))
-    .withBaselineBalance(Money.of(999))
-    .withActivityWindow(
-      ActivityWindow([
-          defaultActivity().build(), defaultActivity().build()
-      ])
-    );
+      .withAccountId(AccountId(42))
+      .withBaselineBalance(Money.of(999))
+      .withActivityWindow(ActivityWindow(
+          [defaultActivity().build(), defaultActivity().build()]));
 }
 
 class AccountBuilder {
@@ -20,23 +17,23 @@ class AccountBuilder {
   ActivityWindow? activityWindow = null;
 
   AccountBuilder withAccountId(AccountId accountId) {
-            this.accountId = accountId;
-        return this;
-  }
-  
-  AccountBuilder withBaselineBalance(Money baselineBalance) {
-            this.baselineBalance = baselineBalance;
-        return this;
-  }
-  
-  AccountBuilder withActivityWindow(ActivityWindow activityWindow) {
-            this.activityWindow = activityWindow;
-        return this;
+    this.accountId = accountId;
+    return this;
   }
 
-    Account build() {
-        return Account.withId(accountId!, baselineBalance!, activityWindow!);
-    }
+  AccountBuilder withBaselineBalance(Money baselineBalance) {
+    this.baselineBalance = baselineBalance;
+    return this;
+  }
+
+  AccountBuilder withActivityWindow(ActivityWindow activityWindow) {
+    this.activityWindow = activityWindow;
+    return this;
+  }
+
+  Account build() {
+    return Account.withId(accountId!, baselineBalance!, activityWindow!);
+  }
 }
 
 ActivityBuilder defaultActivity() {
