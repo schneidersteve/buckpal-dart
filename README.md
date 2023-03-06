@@ -7,6 +7,8 @@ Inspired by https://github.com/thombergs/buckpal
 
 ## Tech Stack
 * [Dart 3](https://dart.dev)
+* [mocktail](https://pub.dev/packages/mocktail)
+* [get_it](https://pub.dev/packages/get_it)
 * [Visual Studio Code](https://code.visualstudio.com)
 * [Visual Studio Code Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-a-git-repository-or-github-pr-in-an-isolated-container-volume)
 
