@@ -3,7 +3,7 @@ import 'package:domain/domain.dart';
 import '../inbound_ports.dart';
 import '../outbound_ports.dart';
 
-class SendMoneyUseCaseImpl extends SendMoneyUseCase {
+class SendMoneyUseCaseImpl implements SendMoneyUseCase {
   final LoadAccountPort loadAccountPort;
   final AccountLock accountLock;
   final UpdateAccountStatePort updateAccountStatePort;
