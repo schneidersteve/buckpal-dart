@@ -1,7 +1,7 @@
 // Fake Repository
 class AccountRepository {
-  AccountEntity findById(int value) {
-    return AccountEntity(1);
+  AccountEntity findById(int accountId) {
+    return AccountEntity(accountId);
   }
 }
 

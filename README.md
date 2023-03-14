@@ -50,6 +50,10 @@ Feature: Send Money
 
 > dart test -r expanded
 
+> dart --enable-experiment=records test
+
 > dart run
 
 > find . -name "*.dart" | entr -cr dart test -r expanded
+
+> find . -name "*.dart" | entr -cr dart --enable-experiment=records test -r expanded

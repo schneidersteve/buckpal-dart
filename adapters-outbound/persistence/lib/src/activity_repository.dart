@@ -1,21 +1,38 @@
 // Fake Repository
 class ActivityRepository {
+  bool isSaved = false;
+
   List<ActivityEntity> findByOwnerAccountIdEqualsAndTimestampGreaterThanEquals(
-      int value, DateTime baselineDate) {
-    return <ActivityEntity>[
-      ActivityEntity(1, DateTime(2018, 8, 8, 8, 0, 0), 1, 1, 2, 500)
-    ].toList();
+      int ownerAccountId, DateTime timestamp) {
+    return List.empty();
+    // return <ActivityEntity>[
+    //   ActivityEntity(1, DateTime(2018, 8, 8, 8, 0, 0), 1, 1, 2, 500)
+    // ].toList();
   }
 
-  int getWithdrawalBalanceUntil(int value, DateTime baselineDate) {
-    return 500;
+  int getWithdrawalBalanceUntil(int accountId, DateTime until) {
+    switch (accountId) {
+      case 1:
+        return isSaved ? 2000 : 1500;
+      case 2:
+        return 2000;
+    }
+    return -1;
   }
 
-  int getDepositBalanceUntil(int value, DateTime baselineDate) {
-    return 400;
+  int getDepositBalanceUntil(int accountId, DateTime until) {
+    switch (accountId) {
+      case 1:
+        return 2000;
+      case 2:
+        return isSaved ? 2000 : 1500;
+    }
+    return -1;
   }
 
-  void save(ActivityEntity ae) {}
+  void save(ActivityEntity ae) {
+    isSaved = true;
+  }
 }
 
 class ActivityEntity {
