@@ -1,5 +1,6 @@
 import 'package:application/application.dart';
 import 'package:domain/domain.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -13,14 +14,14 @@ void main() {
   late HttpServer server;
 
   final sendMoneyUseCase = MockSendMoneyUseCase();
+  GetIt.I.registerSingleton<SendMoneyUseCase>(sendMoneyUseCase);
+
   final command = SendMoneyCommand(AccountId(41), AccountId(42), Money.of(500));
-  when(() => sendMoneyUseCase.sendMoney(command)).thenReturn(true);
+  when(() => sendMoneyUseCase.sendMoney(command)).thenAnswer((_) async => true);
 
   setUp(() async {
-    final router = SendMoneyHandler(sendMoneyUseCase).getRouter();
-    // final cascade = Cascade().add(router);
+    final router = SendMoneyHandler().getRouter();
     server = await shelf_io.serve(router, InternetAddress.anyIPv4, 8080);
-    // sleep(Duration(seconds: 1));
   });
 
   test('Send Money', () async {

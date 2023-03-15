@@ -1,6 +1,6 @@
 // Fake Repository
 class AccountRepository {
-  AccountEntity findById(int accountId) {
+  Future<AccountEntity> findById(int accountId) async {
     return AccountEntity(accountId);
   }
 }

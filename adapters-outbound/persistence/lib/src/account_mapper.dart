@@ -11,7 +11,7 @@ class AccountMapper {
       int withdrawalBalance, int depositBalance) {
     var baselineBalance =
         Money.substract(Money.of(depositBalance), Money.of(withdrawalBalance));
-    return Account.withId(AccountId(account.id!!), baselineBalance,
+    return Account.withId(AccountId(account.id!), baselineBalance,
         mapToActivityWindow(activities));
   }
 

@@ -2,15 +2,11 @@
 class ActivityRepository {
   bool isSaved = false;
 
-  List<ActivityEntity> findByOwnerAccountIdEqualsAndTimestampGreaterThanEquals(
-      int ownerAccountId, DateTime timestamp) {
-    return List.empty();
-    // return <ActivityEntity>[
-    //   ActivityEntity(1, DateTime(2018, 8, 8, 8, 0, 0), 1, 1, 2, 500)
-    // ].toList();
-  }
+  Stream<ActivityEntity>
+      findByOwnerAccountIdEqualsAndTimestampGreaterThanEquals(
+          int ownerAccountId, DateTime timestamp) async* {}
 
-  int getWithdrawalBalanceUntil(int accountId, DateTime until) {
+  Future<int> getWithdrawalBalanceUntil(int accountId, DateTime until) async {
     switch (accountId) {
       case 1:
         return isSaved ? 2000 : 1500;
@@ -20,7 +16,7 @@ class ActivityRepository {
     return -1;
   }
 
-  int getDepositBalanceUntil(int accountId, DateTime until) {
+  Future<int> getDepositBalanceUntil(int accountId, DateTime until) async {
     switch (accountId) {
       case 1:
         return 2000;
@@ -30,7 +26,7 @@ class ActivityRepository {
     return -1;
   }
 
-  void save(ActivityEntity ae) {
+  Future<void> save(ActivityEntity ae) async {
     isSaved = true;
   }
 }

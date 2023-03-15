@@ -1,7 +1,7 @@
 import 'package:domain/domain.dart';
 
 abstract class LoadAccountPort {
-  Account loadAccount(AccountId accountId, DateTime baselineDate);
+  Future<Account> loadAccount(AccountId accountId, DateTime baselineDate);
 }
 
 abstract class AccountLock {

@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 // ------------------------------
 
 abstract class SendMoneyUseCase {
-  bool sendMoney(SendMoneyCommand command);
+  Future<bool> sendMoney(SendMoneyCommand command);
 }
 
 // TODO implement reflection free validating

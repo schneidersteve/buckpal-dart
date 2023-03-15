@@ -1,31 +1,33 @@
 import 'package:domain/domain.dart';
+import 'package:get_it/get_it.dart';
 
 import '../inbound_ports.dart';
 import '../outbound_ports.dart';
 
 class SendMoneyUseCaseImpl implements SendMoneyUseCase {
-  final LoadAccountPort loadAccountPort;
-  final AccountLock accountLock;
-  final UpdateAccountStatePort updateAccountStatePort;
-  final MoneyTransferProperties moneyTransferProperties;
+  late LoadAccountPort _loadAccountPort;
+  late AccountLock _accountLock;
+  late UpdateAccountStatePort _updateAccountStatePort;
+  late MoneyTransferProperties _moneyTransferProperties;
 
-  SendMoneyUseCaseImpl(
-      {required this.loadAccountPort,
-      required this.accountLock,
-      required this.updateAccountStatePort,
-      required this.moneyTransferProperties});
+  SendMoneyUseCaseImpl() {
+    this._loadAccountPort = GetIt.I.get<LoadAccountPort>();
+    this._accountLock = GetIt.I.get<AccountLock>();
+    this._updateAccountStatePort = GetIt.I.get<UpdateAccountStatePort>();
+    this._moneyTransferProperties = GetIt.I.get<MoneyTransferProperties>();
+  }
 
   @override
-  bool sendMoney(SendMoneyCommand command) {
+  Future<bool> sendMoney(SendMoneyCommand command) async {
     _checkThreshold(command);
 
     var baselineDate = DateTime.now().subtract(const Duration(days: 10));
 
-    var sourceAccount =
-        loadAccountPort.loadAccount(command.sourceAccountId, baselineDate);
+    var sourceAccount = await _loadAccountPort.loadAccount(
+        command.sourceAccountId, baselineDate);
 
-    var targetAccount =
-        loadAccountPort.loadAccount(command.targetAccountId, baselineDate);
+    var targetAccount = await _loadAccountPort.loadAccount(
+        command.targetAccountId, baselineDate);
 
     var sourceAccountId = sourceAccount.id;
     if (sourceAccountId == null)
@@ -34,32 +36,32 @@ class SendMoneyUseCaseImpl implements SendMoneyUseCase {
     if (targetAccountId == null)
       throw ArgumentError("expected target account ID not to be empty");
 
-    accountLock.lockAccount(sourceAccountId);
+    _accountLock.lockAccount(sourceAccountId);
     if (!sourceAccount.withdraw(command.money, targetAccountId)) {
-      accountLock.releaseAccount(sourceAccountId);
+      _accountLock.releaseAccount(sourceAccountId);
       return false;
     }
 
-    accountLock.lockAccount(targetAccountId);
+    _accountLock.lockAccount(targetAccountId);
     if (!targetAccount.deposit(command.money, sourceAccountId)) {
-      accountLock.releaseAccount(sourceAccountId);
-      accountLock.releaseAccount(targetAccountId);
+      _accountLock.releaseAccount(sourceAccountId);
+      _accountLock.releaseAccount(targetAccountId);
       return false;
     }
 
-    updateAccountStatePort.updateActivities(sourceAccount);
-    updateAccountStatePort.updateActivities(targetAccount);
+    _updateAccountStatePort.updateActivities(sourceAccount);
+    _updateAccountStatePort.updateActivities(targetAccount);
 
-    accountLock.releaseAccount(sourceAccountId);
-    accountLock.releaseAccount(targetAccountId);
+    _accountLock.releaseAccount(sourceAccountId);
+    _accountLock.releaseAccount(targetAccountId);
     return true;
   }
 
   void _checkThreshold(SendMoneyCommand command) {
     if (command.money
-        .isGreaterThan(moneyTransferProperties.maximumTransferThreshold)) {
+        .isGreaterThan(_moneyTransferProperties.maximumTransferThreshold)) {
       throw ThresholdExceededException(
-          moneyTransferProperties.maximumTransferThreshold, command.money);
+          _moneyTransferProperties.maximumTransferThreshold, command.money);
     }
   }
 }

@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
 import 'package:application/src/c/send_money_use_case.dart';
 import 'package:application/src/inbound_ports.dart';
 import 'package:application/src/outbound_ports.dart';
 import 'package:domain/domain.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -17,29 +16,31 @@ class MockUpdateAccountStatePort extends Mock
 class MockAccount extends Mock implements Account {}
 
 void main() {
-  test('Transaction succeeds', () {
+  test('Transaction succeeds', () async {
+    GetIt.I.reset();
     final loadAccountPort = MockLoadAccountPort();
     final accountLock = MockAccountLock();
     final updateAccountStatePort = MockUpdateAccountStatePort();
-    final sendMoneyUseCase = SendMoneyUseCaseImpl(
-        loadAccountPort: loadAccountPort,
-        accountLock: accountLock,
-        updateAccountStatePort: updateAccountStatePort,
-        moneyTransferProperties:
-            MoneyTransferProperties(Money.of(0x7fffffffffffffff)));
+    GetIt.I.registerSingleton<LoadAccountPort>(loadAccountPort);
+    GetIt.I.registerSingleton<AccountLock>(accountLock);
+    GetIt.I.registerSingleton<UpdateAccountStatePort>(updateAccountStatePort);
+    GetIt.I.registerSingleton<MoneyTransferProperties>(
+        MoneyTransferProperties(Money.of(0x7fffffffffffffff)));
+
+    final sendMoneyUseCase = SendMoneyUseCaseImpl();
 
     // Given a source account
     final sourceAccount = MockAccount();
     var sourceAccountId = new AccountId(41);
     when(() => sourceAccount.id).thenReturn(sourceAccountId);
     when(() => loadAccountPort.loadAccount(sourceAccountId, any()))
-        .thenReturn(sourceAccount);
+        .thenAnswer((_) async => sourceAccount);
     // And a target account
     final targetAccount = MockAccount();
     var targetAccountId = new AccountId(42);
     when(() => targetAccount.id).thenReturn(targetAccountId);
     when(() => loadAccountPort.loadAccount(targetAccountId, any()))
-        .thenReturn(targetAccount);
+        .thenAnswer((_) async => targetAccount);
     // And
     var money = Money.of(500);
 
@@ -52,7 +53,7 @@ void main() {
     // When money is send
     var command =
         new SendMoneyCommand(sourceAccount.id!, targetAccount.id!, money);
-    var success = sendMoneyUseCase.sendMoney(command);
+    var success = await sendMoneyUseCase.sendMoney(command);
 
     // Then send money succeeds
     expect(success, true);
@@ -75,32 +76,34 @@ void main() {
   });
 
   test('Given Withdrawal Fails then Only Source Account Is Locked And Released',
-      () {
+      () async {
     registerFallbackValue(Money.of(-1));
     registerFallbackValue(AccountId(-1));
 
+    GetIt.I.reset();
     final loadAccountPort = MockLoadAccountPort();
     final accountLock = MockAccountLock();
-    final updateAccountStatePort = MockUpdateAccountStatePort();
-    final sendMoneyUseCase = SendMoneyUseCaseImpl(
-        loadAccountPort: loadAccountPort,
-        accountLock: accountLock,
-        updateAccountStatePort: updateAccountStatePort,
-        moneyTransferProperties:
-            MoneyTransferProperties(Money.of(0x7fffffffffffffff)));
+    GetIt.I.registerSingleton<LoadAccountPort>(loadAccountPort);
+    GetIt.I.registerSingleton<AccountLock>(accountLock);
+    GetIt.I.registerSingleton<UpdateAccountStatePort>(
+        MockUpdateAccountStatePort());
+    GetIt.I.registerSingleton<MoneyTransferProperties>(
+        MoneyTransferProperties(Money.of(0x7fffffffffffffff)));
+
+    final sendMoneyUseCase = SendMoneyUseCaseImpl();
 
     // Given a source account
     final sourceAccount = MockAccount();
     var sourceAccountId = new AccountId(41);
     when(() => sourceAccount.id).thenReturn(sourceAccountId);
     when(() => loadAccountPort.loadAccount(sourceAccountId, any()))
-        .thenReturn(sourceAccount);
+        .thenAnswer((_) async => sourceAccount);
     // And a target account
     final targetAccount = MockAccount();
     var targetAccountId = new AccountId(42);
     when(() => targetAccount.id).thenReturn(targetAccountId);
     when(() => loadAccountPort.loadAccount(targetAccountId, any()))
-        .thenReturn(targetAccount);
+        .thenAnswer((_) async => targetAccount);
     // And source account withdrawal will fail
     when(() => sourceAccount.withdraw(any(), any())).thenReturn(false);
     // And target account deposit will succeed
@@ -109,7 +112,7 @@ void main() {
     // When money is send
     var command = new SendMoneyCommand(
         sourceAccount.id!, targetAccount.id!, Money.of(300));
-    var success = sendMoneyUseCase.sendMoney(command);
+    var success = await sendMoneyUseCase.sendMoney(command);
 
     // Then send money failed
     expect(success, false);

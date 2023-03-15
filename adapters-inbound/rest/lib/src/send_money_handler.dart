@@ -1,12 +1,15 @@
 import 'package:application/application.dart';
 import 'package:domain/domain.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
 class SendMoneyHandler {
-  SendMoneyUseCase _sendMoneyUseCase;
+  late SendMoneyUseCase _sendMoneyUseCase;
 
-  SendMoneyHandler(this._sendMoneyUseCase);
+  SendMoneyHandler() {
+    this._sendMoneyUseCase = GetIt.I.get<SendMoneyUseCase>();
+  }
 
   Response _send_money(Request request, String sourceAccountId,
       String targetAccountId, String amount) {

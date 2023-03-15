@@ -12,6 +12,7 @@ dependencies:
   domain:
     path: ../domain
   equatable: ^2.0.0
+  get_it: ^7.2.0
 
 dev_dependencies:
   lints: ^2.0.0
